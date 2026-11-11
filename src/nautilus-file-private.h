@@ -27,7 +27,7 @@ typedef enum {
 struct NautilusFilePrivate
 {
 	NautilusDirectory *directory;
-	
+
 	GRefString *name;
 
 	/* File info: */
@@ -35,13 +35,12 @@ struct NautilusFilePrivate
 
 	GRefString *display_name;
 	char *display_name_collation_key;
-	char *directory_name_collation_key;
 	GRefString *edit_name;
 
 	goffset size; /* -1 is unknown */
-	
+
 	int sort_order;
-	
+
 	guint32 permissions;
 	gboolean has_uid;
 	uid_t uid;
@@ -51,19 +50,19 @@ struct NautilusFilePrivate
 	GRefString *owner;
 	GRefString *owner_real;
 	GRefString *group;
-	
+
 	time_t atime; /* 0 is unknown */
 	time_t mtime; /* 0 is unknown */
 	time_t btime; /* 0 is unknown */
-	
+
 	char *symlink_name;
-	
+
 	GRefString *mime_type;
-	
+
 	char *selinux_context;
-	
+
 	GError *get_info_error;
-	
+
 	guint directory_count;
 
 	guint deep_directory_count;
@@ -72,7 +71,7 @@ struct NautilusFilePrivate
 	goffset deep_size;
 
 	GIcon *icon;
-	
+
 	char *thumbnail_path;
 	GdkTexture *thumbnail;
 	time_t thumbnail_mtime;
@@ -106,7 +105,7 @@ struct NautilusFilePrivate
 
 	/* Mount for mountpoint or the references GMount for a "mountable" */
 	GMount *mount;
-	
+
 	/* boolean fields: bitfield to save space, since there can be
            many NautilusFile objects. */
 
@@ -123,7 +122,7 @@ struct NautilusFilePrivate
 	guint got_file_info                 : 1;
 	guint get_info_failed               : 1;
 	guint file_info_is_up_to_date       : 1;
-	
+
 	guint got_directory_count           : 1;
 	guint directory_count_failed        : 1;
 	guint directory_count_is_up_to_date : 1;
@@ -134,7 +133,7 @@ struct NautilusFilePrivate
            forget it rather than invalidating. */
 
 	guint mount_is_up_to_date           : 1;
-	
+
 	guint got_custom_display_name       : 1;
 
         guint thumbnail_info_is_up_to_date  : 1;
@@ -146,7 +145,7 @@ struct NautilusFilePrivate
 	guint is_hidden                     : 1;
 
 	guint has_permissions               : 1;
-	
+
 	guint can_read                      : 1;
 	guint can_write                     : 1;
 	guint can_execute                   : 1;
@@ -188,7 +187,7 @@ typedef struct {
 	NautilusFileOperationCallback callback;
 	gpointer callback_data;
 	gboolean is_rename;
-	
+
 	gpointer data;
 	GDestroyNotify free_data;
 	NautilusFileUndoInfo *undo_info;

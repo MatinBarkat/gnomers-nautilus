@@ -437,13 +437,14 @@ compare_data_func (gconstpointer a,
                    gpointer      user_data)
 {
     NautilusViewModel *self = (NautilusViewModel *) user_data;
+    GtkSorter *sorter = nautilus_view_model_get_sorter (self);
 
-    if (nautilus_view_model_get_sorter (self) == NULL)
+    if (sorter == NULL)
     {
         return GTK_ORDERING_EQUAL;
     }
 
-    return gtk_sorter_compare (nautilus_view_model_get_sorter (self), (gpointer) a, (gpointer) b);
+    return gtk_sorter_compare (sorter, (gpointer) a, (gpointer) b);
 }
 
 NautilusViewModel *
@@ -611,22 +612,23 @@ splice_items_into_common_parent (NautilusViewModel *self,
 
 void
 nautilus_view_model_add_items (NautilusViewModel *self,
-                               GList             *items)
+                               GPtrArray         *items)
 {
     g_autoptr (GPtrArray) array = g_ptr_array_new ();
+    g_autoptr (GPtrArray) sorted_items = g_ptr_array_copy (items, NULL, NULL);
     g_autoptr (NautilusFile) previous_parent = NULL;
-    g_autoptr (GList) sorted_items = NULL;
-    NautilusViewItem *item;
 
+    /* The copy doesn't own the items; don't let it unref them. */
+    g_ptr_array_set_free_func (sorted_items, NULL);
     /* The first added file becomes the initial focus and scroll anchor, so we
      * need to sort items before adding them to the internal model. */
-    sorted_items = g_list_sort_with_data (g_list_copy (items), compare_data_func, self);
+    g_ptr_array_sort_values_with_data (sorted_items, compare_data_func, self);
 
-    for (GList *l = sorted_items; l != NULL; l = l->next)
+    for (guint i = 0; i < sorted_items->len; i++)
     {
         g_autoptr (NautilusFile) parent = NULL;
+        NautilusViewItem *item = NAUTILUS_VIEW_ITEM (g_ptr_array_index (sorted_items, i));
 
-        item = NAUTILUS_VIEW_ITEM (l->data);
         parent = nautilus_file_get_parent (nautilus_view_item_get_file (item));
 
         if (previous_parent != NULL && previous_parent != parent)
@@ -635,8 +637,7 @@ nautilus_view_model_add_items (NautilusViewModel *self,
             splice_items_into_common_parent (self, array, previous_parent);
 
             /* Clear pending items and start a new with a new parent. */
-            g_ptr_array_unref (array);
-            array = g_ptr_array_new ();
+            g_ptr_array_set_size (array, 0);
         }
         g_set_object (&previous_parent, parent);
 
